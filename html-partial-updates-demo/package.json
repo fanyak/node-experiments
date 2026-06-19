@@ -1,0 +1,18 @@
+{
+  "name": "html-partial-updates-demo",
+  "version": "1.0.0",
+  "description": "declarative partial updates",
+  "license": "ISC",
+  "author": "Fani Akritidou",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "test"
+  },
+  "dependencies": {
+    "@types/node": "25.9.3"
+  },
+  "devDependencies": {
+    "close-with-grace": "2.5.0"
+  }
+}
