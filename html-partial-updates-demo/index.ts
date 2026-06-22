@@ -1,3 +1,7 @@
+import {loadEnvFile} from "node:process"
+
+loadEnvFile(); // load vars to process.env
+
 interface User {
   id: string;
   name: string;
@@ -55,32 +59,33 @@ async function fetchUser(userId: string): Promise<ApiResponse<User>> {
   }
   
 }
-const localhost = 'http://localhost:3000'
-const pathname = '/dodbook';
+
+const {localhost, pathname, DoDhost, tagLimit} = process.env;
 
 const nodeTags: Array<string> = Array.from({ length: 12 }, (_, i) => `Node${i + 1}`);
 console.log(nodeTags);
 
-async function fetchNode(nodeTag: string): Promise<ApiResponse<Record<string, string>>> { 
+async function fetchNode(nodeTag: string): Promise<ApiResponse<string>> { 
   const res = await fetch(`${localhost}${pathname}?node=${nodeTag}`);
   if (!res.ok) {
     return {
       type: "error",
-      message: `Failed to fetch node content: ${res.statusText}`
+      message: `status code: ${res.status}. \n Failed to fetch node content: ${res.statusText}`
     };
   }
-  let result = await res.json();
-  console.log(result['5']);
+  let result = await res.text();
   return {
     type: "success",
     data: result
   };
 }
-
-fetchNode("node5").then(response => {
+const nodeTag = process.argv.slice(2)[0] || "node1";
+fetchNode(nodeTag).then(response => {
   if (response.type === "success") {
     console.log("Node content:", response.data);
   } else {
     console.error("Error fetching node:", response.message);
   }
+}).catch(error => { // this will be called when server can't be reached
+  console.log("server error", error);
 });

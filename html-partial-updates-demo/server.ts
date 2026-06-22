@@ -132,12 +132,13 @@ function closeServer(server: Server): Promise<void> {
 //   await closeServer(dodServer);
 // })()
 
-export async function main() {
+export async function main(): Promise<void> {
   const server: Server = http.createServer(createHandler());
   server.listen(3000, () => {
     console.log(`DoD server is running on ${localhost}`);
   });
 
+  // will close on signals SIGINT, SIGTERM, SIGHUP, SIGQUIT, and uncaught exceptions
   closeWithGrace({delay: 10000}, async ({signal, err}) => {
     if(err) {
       console.error(`Error during shutdown: ${err.message}`);
@@ -148,11 +149,13 @@ export async function main() {
     // if the closeServer promise is rejected, the error will bubbule to the async main function.
     // we will catch the error at the main function's call site and log it to the console.
     await closeServer(server);
-  })
+    console.log('Server closed successfully');
+  });
 
 }
 
-const isMain = process.argv[1] === __filename;
+
+const isMain = process.argv[1].endsWith('server.ts') || process.argv[1].endsWith('server.js');
 if (isMain) {
   main().catch((err) => {
     console.error(`Error in main function: ${err.message}`);
