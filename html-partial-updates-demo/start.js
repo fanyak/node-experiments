@@ -26,3 +26,21 @@ const server = http.createServer(async (req, res) => {
 server.listen(3000, () => {
   console.log("Server is listening on port 3000");
 });
+
+// async function fetchMultiple(urls = ['http://localhost:3000/dodbook?node=node1','http://localhost:3000/dodbook?node=nodes']) {
+//   const results = await Promise.allSettled(
+//     urls.map((url) => fetch(url).then((r) => r.text()))
+//   );
+
+//   const map = new Map();
+//   urls.forEach((url, i) => {
+//     const result = results[i];
+//     map.set(
+//       url,
+//       result.status === 'fulfilled' ? result.value : result.reason
+//     );
+//   });
+
+//   return map;
+// }
+// console.log(await fetchMultiple());

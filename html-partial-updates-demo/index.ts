@@ -1,3 +1,5 @@
+import { noderegx } from "./utils.js";
+import {writeFileSync} from "node:fs";
 import {loadEnvFile} from "node:process"
 
 loadEnvFile(); // load vars to process.env
@@ -62,11 +64,22 @@ async function fetchUser(userId: string): Promise<ApiResponse<User>> {
 
 const {localhost, pathname, DoDhost, tagLimit} = process.env;
 
-const nodeTags: Array<string> = Array.from({ length: 12 }, (_, i) => `Node${i + 1}`);
-console.log(nodeTags);
+type TagLimit = number & { __brand: "TagLimit" };
+
+function getTagLimit(tagLimit: string | undefined): TagLimit {
+  if (tagLimit === undefined) {
+    throw new Error("tagLimit is not defined in environment variables");
+  }  
+  return parseInt(tagLimit) as TagLimit;
+}
 
 async function fetchNode(nodeTag: string): Promise<ApiResponse<string>> { 
-  const res = await fetch(`${localhost}${pathname}?node=${nodeTag}`);
+  const res:Response = await fetch(`${localhost}${pathname}?node=${nodeTag}`, {
+    method: "GET",
+    headers: {
+      "Connection": parseInt(nodeTag.substring(4)) <= getTagLimit(tagLimit) ? "keep-alive" : "close"
+    }
+  });
   if (!res.ok) {
     return {
       type: "error",
@@ -79,13 +92,53 @@ async function fetchNode(nodeTag: string): Promise<ApiResponse<string>> {
     data: result
   };
 }
-const nodeTag = process.argv.slice(2)[0] || "node1";
-fetchNode(nodeTag).then(response => {
-  if (response.type === "success") {
-    console.log("Node content:", response.data);
-  } else {
-    console.error("Error fetching node:", response.message);
-  }
-}).catch(error => { // this will be called when server can't be reached
-  console.log("server error", error);
+
+
+const args = process.argv.slice(2);
+
+if (args.length === 0) {
+  console.error("Please provide a node tag as an argument.");
+  process.exit(1);
+}
+if (args.length > 1) {
+  console.error("Please provide only one node tag as an argument or 'all' as argument.");
+  process.exit(1);
+}
+if (args[0] === "all") { 
+  const nodeTags: Array<string> = Array.from({ length: getTagLimit(tagLimit) }, (_, i) => `node${i + 1}`);
+  const urls: Array<Promise<ApiResponse<string>>> = nodeTags.map(nodeTag => fetchNode(nodeTag));
+  Promise.allSettled(urls).then((responses: Array<PromiseSettledResult<ApiResponse<string>>>) => {
+   return responses.reduce((acc: Array<string>, current: PromiseSettledResult<ApiResponse<string>>) => {
+      // fullfilled responses maybe of type SuccessResponse or ErrorResponse
+      if (current.status === "fulfilled") {
+          if (current.value.type === 'success') {
+          acc.push(current.value.data);    
+        }   
+      }
+       return acc;
+    }, [] as Array<string>);
+  }).then((results) => {
+    const filePath = "./all_nodes_content.txt";
+    writeFileSync(filePath, results.join("\n\n"), "utf-8");
+    console.log(`All node content has been written to ${filePath}`);
+  }).catch((error) => {
+    console.error("Error fetching nodes:", error);
+  });
+
+}
+
+if (noderegx.test(args[0])) {
+  const nodeTag = args[0];
+  fetchNode(nodeTag).then(response => {
+    if (response.type === "success") {
+      // return response to cli
+      console.log("Node content:", response.data);
+    } else {
+      console.error("Error fetching node:", response.message);
+    }
+  }).catch(error => { // this will be called when server can't be reached
+    console.log("server error", error);
 });
+}
+
+

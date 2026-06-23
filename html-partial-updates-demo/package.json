@@ -13,6 +13,7 @@
     "@types/node": "25.9.3"
   },
   "devDependencies": {
-    "close-with-grace": "2.5.0"
+    "close-with-grace": "2.5.0",
+    "typescript": "^6.0.3"
   }
 }

@@ -1,6 +1,7 @@
 import http, { type Server } from 'node:http';
 import { loadEnvFile } from "node:process"
 import closeWithGrace from 'close-with-grace';
+import { noderegx } from "./utils.js";
 
 // load .env file to process.env object
 loadEnvFile();
@@ -23,7 +24,7 @@ function assertValidNodeTag(tag: unknown): asserts tag is ValidNodeTag {
   if (typeof tag !== "string") {
     throw new Error(`Invalid node tag format: ${tag}`);
   }
-  if (!/^node\d{1,2}$/.test(tag)) {
+  if (!noderegx.test(tag)) {
     throw new Error(`Invalid node tag format: ${tag}`);
   }
 }
@@ -35,6 +36,7 @@ function assertValidNodeTag(tag: unknown): asserts tag is ValidNodeTag {
  */
 
 let isShuttingDown = false;
+
 function createHandler() {
   return async (req: http.IncomingMessage, res: http.ServerResponse) => {
     if (isShuttingDown) {
