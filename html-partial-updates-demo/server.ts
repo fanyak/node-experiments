@@ -1,12 +1,13 @@
 import http, { type Server } from 'node:http';
+import { extname } from 'node:path';
 import { loadEnvFile } from "node:process"
 import closeWithGrace from 'close-with-grace';
-import { noderegx } from "./utils.js";
+import { noderegx, MIME_TYPES } from "./utils.js";
+import { readFileSync } from 'node:fs';
 
 // load .env file to process.env object
 loadEnvFile();
-
-const {localhost, pathname, DoDhost, tagLimit} = process.env;
+const {localhost, DoDhost, tagLimit} = process.env;
 
 type NodeNumber<T> = T extends `node${infer N}` ? N : never;
 type ValidNodeTag = string & {__brand: "ValidNodeTag" };
@@ -49,7 +50,7 @@ function createHandler() {
     if (pathname === '/dodbook') {
       if (isShuttingDown) {
         res.statusCode = 503;
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Type', MIME_TYPES.json);
         res.end(JSON.stringify({status: "shutting down"}));
         return;
       }
@@ -60,8 +61,10 @@ function createHandler() {
         assertValidNodeTag(node);
       } catch {
         // Bad request, send 400 response with error message
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: "Invalid node tag format" }));
+        const mesage = `Invalid node tag format: ${node}`;
+        res.writeHead(400, { 'Content-Type': MIME_TYPES.json });
+        res.statusMessage = mesage;
+        res.end(JSON.stringify({ error: mesage }));
         return;
       }
       try {        
@@ -69,32 +72,40 @@ function createHandler() {
         assertTagIsWithinLimit(nodeTagNumber);
       } catch {
         // Resource not found, send 404 response with error message
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: `Node tag must be between 1 and ${tagLimit}` }));
+        res.writeHead(404, { 'Content-Type': MIME_TYPES.json });
+        const message = `Node tag must be between 1 and ${tagLimit}`;
+        res.statusMessage = message;
+        res.end(JSON.stringify({ error: message }));
         return;
       }
       const url: validUrl = `${DoDhost!}/${node}.html`;
-      console.log(`fetching ${url}`);
       try {
+        await sleep(2000); // simulate network delay
+        console.log(`fetching ${url}`);
         const f = await fetch(url)
         if (!f.ok) {
           res.statusCode = 500;
-          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Content-Type', MIME_TYPES.json);
           res.end(JSON.stringify({ error: `Failed to fetch content for ${node}: ${f.statusText}` }));
           return;
         }      
         const content = await f.text();
-        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.writeHead(200, { 'Content-Type': MIME_TYPES.html });
         res.end(content);
       } catch (error) {
           res.statusCode = 500;
-          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Content-Type',  MIME_TYPES.json);
           res.end(JSON.stringify({ error: `${(error as Error)?.message} || "Unknown error"` }));
       } 
       return;
     }
+    if (extname(pathname) === ".html") { 
+      res.writeHead(200, {"Content-Type": MIME_TYPES.html });
+      res.write(readFileSync(`.${pathname}`, "utf-8"));
+      return;
+    }
     // Handle other routes or methods
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.writeHead(200, { 'Content-Type': MIME_TYPES.txt });
     res.end('Hello from the DoD server!');
   }
 }
@@ -147,6 +158,13 @@ export async function main(): Promise<void> {
     }
     console.log(`Received signal ${signal}. Shutting down gracefully...`);
     isShuttingDown = true;
+    server.getConnections((err, count) => {
+      if (err) {
+        console.error(`Error getting connections: ${err.message}`);
+        return;
+      }
+      console.log(`Number of active connections: ${count}`);
+    });
     
     // if the closeServer promise is rejected, the error will bubbule to the async main function.
     // we will catch the error at the main function's call site and log it to the console.

@@ -58,10 +58,10 @@ async function fetchUser(userId: string): Promise<ApiResponse<User>> {
       type: "error",
       message: error instanceof Error ? error.message : "Unknown error"
     })
-  }
-  
+  }  
 }
 
+// get vars from process.env
 const {localhost, pathname, DoDhost, tagLimit} = process.env;
 
 type TagLimit = number & { __brand: "TagLimit" };
@@ -73,7 +73,7 @@ function getTagLimit(tagLimit: string | undefined): TagLimit {
   return parseInt(tagLimit) as TagLimit;
 }
 
-async function fetchNode(nodeTag: string): Promise<ApiResponse<string>> { 
+async function fetchNode(nodeTag: string): Promise<ApiResponse<Document>> { 
   const res:Response = await fetch(`${localhost}${pathname}?node=${nodeTag}`, {
     method: "GET",
     headers: {
@@ -86,13 +86,13 @@ async function fetchNode(nodeTag: string): Promise<ApiResponse<string>> {
       message: `status code: ${res.status}. \n Failed to fetch node content: ${res.statusText}`
     };
   }
-  let result = await res.text();
+  const data: Document = await res.text() as unknown as Document;
   return {
     type: "success",
-    data: result
+    data
   };
 }
-
+// CLI logic
 
 const args = process.argv.slice(2);
 
@@ -105,10 +105,13 @@ if (args.length > 1) {
   process.exit(1);
 }
 if (args[0] === "all") { 
+
   const nodeTags: Array<string> = Array.from({ length: getTagLimit(tagLimit) }, (_, i) => `node${i + 1}`);
-  const urls: Array<Promise<ApiResponse<string>>> = nodeTags.map(nodeTag => fetchNode(nodeTag));
-  Promise.allSettled(urls).then((responses: Array<PromiseSettledResult<ApiResponse<string>>>) => {
-   return responses.reduce((acc: Array<string>, current: PromiseSettledResult<ApiResponse<string>>) => {
+
+  const urls: Array<Promise<ApiResponse<Document>>> = nodeTags.map(nodeTag => fetchNode(nodeTag));
+  
+  Promise.allSettled(urls).then((responses: Array<PromiseSettledResult<ApiResponse<Document>>>) => {
+   return responses.reduce((acc: Array<Document>, current: PromiseSettledResult<ApiResponse<Document>>) => {
       // fullfilled responses maybe of type SuccessResponse or ErrorResponse
       if (current.status === "fulfilled") {
           if (current.value.type === 'success') {
@@ -116,11 +119,13 @@ if (args[0] === "all") {
         }   
       }
        return acc;
-    }, [] as Array<string>);
-  }).then((results) => {
-    const filePath = "./all_nodes_content.txt";
-    writeFileSync(filePath, results.join("\n\n"), "utf-8");
-    console.log(`All node content has been written to ${filePath}`);
+    }, [] as Array<Document>);
+  }).then((results: Array<Document>) => {
+    results.forEach((result: Document, index) =>{
+    const filePath = `./node${index + 1}.html`;
+    writeFileSync(filePath, (result as unknown as string), "utf-8");
+    console.log(`All node content has been written to ${filePath}`);});
+    
   }).catch((error) => {
     console.error("Error fetching nodes:", error);
   });
