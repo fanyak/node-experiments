@@ -1,0 +1,589 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<link href='http://fonts.googleapis.com/css?family=Lato:300,700,300italic,700italic' rel='stylesheet' type='text/css'>
+<TITLE>Searching</TITLE>
+<META NAME="description" CONTENT="Searching">
+<META NAME="keywords" CONTENT="dodmain">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="dodmain.css">
+
+<LINK REL="next" HREF="node8.html">
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="dodmain.html">
+<LINK REL="next" HREF="node8.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html384"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html380"
+  HREF="dodmain.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html374"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html382"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html385"
+  HREF="node8.html">Sorting</A>
+<B> Up:</B> <A NAME="tex2html381"
+  HREF="dodmain.html">Data-Oriented Design</A>
+<B> Previous:</B> <A NAME="tex2html375"
+  HREF="node6.html">Hierarchical Level of Detail</A>
+ &nbsp; <B>  <A NAME="tex2html383"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+<tt>Online release of Data-Oriented Design : <br>This is the free, online, reduced version. Some inessential chapters are excluded from this version, but in the spirit of this being an education resource, the essentials are present for anyone wanting to learn about data-oriented design.<br>Expect some odd formatting and some broken images and listings as this is auto generated and the Latex to html converters available are not perfect. If the source code listing is broken, you should be able to find the referenced source on <a href="https://github.com/raspofabs/dodbooksourcecode/">github</a>. If you like what you read here, consider purchasing the real paper book from <a href="https://www.amazon.com/dp/1916478700">here</a>, as not only will it look a lot better, but it will help keep this version online for those who cannot afford to buy it. Please send any feedback to <a href="mailto:support@dataorienteddesign.com">support@dataorienteddesign.com</a></tt><br>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html386"
+  HREF="node7.html#SECTION00710000000000000000">Indexes</A>
+<LI><A NAME="tex2html387"
+  HREF="node7.html#SECTION00720000000000000000">Data-oriented Lookup</A>
+<LI><A NAME="tex2html388"
+  HREF="node7.html#SECTION00730000000000000000">Finding low and high</A>
+<LI><A NAME="tex2html389"
+  HREF="node7.html#SECTION00740000000000000000">Finding random</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00700000000000000000"></A><A NAME="chap:search"></A>
+<BR>
+Searching
+</H1>
+
+<P>
+When looking for specific data, it's very important to remember why you're
+doing it. If the search is not necessary, then that's your biggest possible
+saving. Finding if a row exists in a table will be slow if approached na&#239;vely.
+You can manually add searching helpers such as binary trees, hash tables, or
+just keep your table sorted by using ordered insertion whenever you add to the
+table. If you're looking to do the latter, this could slow things down, as
+ordered inserts aren't normally concurrent, and adding extra helpers is
+normally a manual task. In this chapter, we find ways to combat all these
+problems.
+
+<P>
+
+<H1><A NAME="SECTION00710000000000000000">
+Indexes</A>
+</H1>
+
+<P>
+Database management systems have long held the concept of an index.
+Traditionally, they were automatically added when a DBMS noticed a
+particular query had been run a large number of times.  We can use this idea
+and implement a just-in-time indexing system in our games to provide the same
+kinds of performance improvement.
+
+<P>
+In SQL, every time you want to find out if an element exists, or even just
+generate a subset like when you need to find all the entities in a certain
+range, you will have to build it as a query. The query exists as an entity of a
+kind, and helps build intuition into the DBMS.
+
+<P>
+The query that creates the row or table generation can be thought of as an
+object which can hang around in case it's used again, and can transform itself
+depending on how it's used over time.  Starting out as a simple linear search
+query (if the data is not already sorted), the process can find out that it's
+being used quite often through internal telemetry, and be able to discover that
+it generally returns a simply tunable set of results, such as the first N
+items in a sorted list.  After some predefined threshold number of operations,
+lifetime, or other metric, it would be valuable for the query object to hook
+itself into the tables it references.  Hooking into the insertion,
+modification, and deletion would allow the query to update its answers, rather
+than run the full query again each time it's asked.
+
+<P>
+This kind of smart object is what object-oriented programming can bring to
+data-oriented design. It can be a significant saving in some cases, but it can
+also be safe, due to its optionality.
+
+<P>
+If we build generalised backends to handle building queries into these tables,
+they can provide multiple benefits. Not only can we expect garbage collection
+of indexes which aren't in use, but they can also make the programs in some way
+self-documenting and self-profiling. If we study the logs of what tables had
+pushed for building indexes for their queries, then we can see data hotspots
+and where there is room for improvement. It may even be possible to have the
+code self-document what optimisation steps should be taken.
+
+<P>
+
+<H1><A NAME="SECTION00720000000000000000">
+Data-oriented Lookup</A>
+</H1>
+
+<P>
+The first step in any data-oriented approach to searching is to understand the
+difference between the search criteria, and the data dependencies of the
+search criteria.
+Object-oriented solutions to searching often ask the object whether or not it
+satisfies some criteria. Because the object is asked a question, there can
+be a lot of code required, memory indirectly accessed, and
+cache lines filled but hardly utilised. Even outside of object-oriented
+code-bases, there's still a lot of poor utilisation of memory bandwidth. In listing
+<A HREF="#src:binarykeylookup"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>, there is an example of simple binary search for a
+key in a na&#239;ve implementation of an animation container. This kind of data
+access pattern is common in animation libraries, but also in many hand-rolled
+structures which look up entries that are trivially sorted along an axis.
+
+<P>
+<BR>
+<IMG
+ WIDTH="595" HEIGHT="270" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="\begin{linespread}{0.75}\lstinputlisting[language=C,caption={Binary search throu...
+...bjects},label=src:binarykeylookup]{src/SRCH_BinaryKeyLookup.cpp}\end{linespread}">
+<BR>
+
+<P>
+We can improve on this very quickly by understanding the dependence on the
+producer and the consumer of the process.  Listing <A HREF="#src:binarytimelookup"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>,
+is a quick rewrite that saves us a lot of memory requests by moving out to a
+partial structure-of-arrays approach.  The data layout stems from recognising
+what data is needed to satisfy the requirements of the program.
+
+<P>
+First, we consider what we have to work with as inputs, and then what we need
+to provide as outputs. The only input we have is a time value in the form of a
+float, and the only value we need to return in this instance is an animation
+key. The animation key we need to return is dependent on data internal to our
+system, and we are allowing ourselves the opportunity to rearrange the data any
+way we like. As we know the input will be compared to the key times, but not
+any of the rest of the key data, we can extract the key times to a separate
+array.  We don't need to access just one part of the animation key when we find
+the one we want to return, but instead, we want to return the whole key. Given
+that, it makes sense to keep the animation key data as an array of structures
+so we access fewer cache lines when returning the final value.
+
+<P>
+<BR>
+<IMG
+ WIDTH="595" HEIGHT="270" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="\begin{linespread}{0.75}\lstinputlisting[language=C,caption={Binary search throu...
+...lues},label=src:binarytimelookup]{src/SRCH_BinaryTimeLookup.cpp}\end{linespread}">
+<BR>
+
+<P>
+It is faster on most hardware, but why is
+it faster? The first impression most people get is that we've moved the keys
+from nearby the returned data, ensuring we have another fetch before we have
+the chance to return.  Sometimes it pays to think a bit further than what looks
+right at first glance.  Let's look at the data layout of the AnimKeys.
+
+<P>
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER" COLSPAN=1><SPAN>t</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>tx</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>ty</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>tz</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>sx</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>sy</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>sz</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>rs</SPAN></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="CENTER" COLSPAN=1><SPAN>ri</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>rj</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>rk</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> t</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> tx</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> ty</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> tz</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> sx</FONT></SPAN></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN=-2 WIDTH=1><SPAN><</SPAN>#3834#></TD>
+</TR>
+<TR><TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> sy</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> sz</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> rs</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> ri</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> rj</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>[HTML]000000
+<FONT COLOR="#000000"> rk</FONT></SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>t</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=1><SPAN>tx</SPAN></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT">ty</TD>
+<TD ALIGN="LEFT">tz</TD>
+<TD ALIGN="LEFT">sx</TD>
+<TD ALIGN="LEFT">sy</TD>
+<TD ALIGN="LEFT">sz</TD>
+<TD ALIGN="LEFT">rs</TD>
+<TD ALIGN="LEFT">ri</TD>
+<TD ALIGN="LEFT">rj</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN=-2 WIDTH=1><SPAN><</SPAN>#3844#></TD>
+</TR>
+<TR><TD ALIGN="LEFT">rk</TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> t</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> tx</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> ty</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> tz</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> sx</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> sy</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> sz</FONT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> rs</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> ri</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> rj</FONT></TD>
+<TD ALIGN="LEFT">[HTML]000000
+<FONT COLOR="#000000"> rk</FONT></TD>
+<TD ALIGN="LEFT">t</TD>
+<TD ALIGN="LEFT">.</TD>
+<TD ALIGN="LEFT">.</TD>
+<TD ALIGN="LEFT">.</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN=-2 WIDTH=1><SPAN><</SPAN>#3862#></TD>
+</TR>
+</TABLE>
+<P>
+Primarily, the processing we want to be doing is all about
+finding the index of the key by hunting for through values in a list of times. In the extracted times code, we're
+no longer looking for a whole struct by one of its members in an array of
+structs. This is faster because the cache will be filled with mostly pertinent
+data during the hunt phase. In the original layout, we one or two key times per cache line. In the updated code, we see 16 key times per cache line.
+
+<P>
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER">t0</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t1</FONT> </TD>
+<TD ALIGN="CENTER">t2</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t3</FONT>  </TD>
+<TD ALIGN="CENTER">t4</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t5</FONT>  </TD>
+<TD ALIGN="CENTER">t6</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t7</FONT>  </TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="CENTER">t8</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t9</FONT> </TD>
+<TD ALIGN="CENTER">t10</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t11</FONT> </TD>
+<TD ALIGN="CENTER">t12</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t13</FONT> </TD>
+<TD ALIGN="CENTER">t14</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> t15</FONT> </TD>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN=-2 WIDTH=1><SPAN><</SPAN>#3884#></TD>
+</TR>
+</TABLE>
+<P>
+There are ways to organise the data better still,
+but any more optimisation requires a complexity or space time trade off. A
+basic binary search will home in on the correct data quite quickly, but each of
+the first steps will cause a new cache line to be read in.  If you know how big
+your cache line is, then you can check all the values that have been loaded for
+free while you wait for the next cache line to load in.  Once you have got near
+the destination, most of the data you need is in the cache and all you're doing
+from then on is making sure you have found the right key. In a cache line aware
+engine, all this can be done behind the scenes with a well-optimised search
+algorithm usable all over the game code. It is worth mentioning again, 
+every time you break out into larger data structures, you deny your proven code
+the chance to be reused.
+
+<P>
+A binary search is one of the best search algorithms for using the smallest
+number of <!-- MATH
+ $instructions$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="91" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img29.png"
+ ALT="$ instructions$"></SPAN> to find a key value. But if you want the fastest
+algorithm, you must look at what takes time, and often, it's not the
+instructions. Loading a whole cache line of information and doing as much as
+you can with that would be a lot more helpful than using the smallest number of
+instructions. It is worth considering that two different data layouts for an
+algorithm could have more impact than the algorithm used.
+
+<P>
+As a comparison to the previous animation key finding code, a third solution was
+developed which attempted to utilise the remaining cache line space in the
+structure. The structure that contained the number of keys, and the two
+pointers to the times and the key data, had quite a bit of space left on the
+cache line. One of the biggest costs on the PS3 and Xbox360 was poor cache line
+utilisation, or CLU. In modern CPUs, it's not quite as bad, partially because
+the cache lines are smaller, but it's still worth thinking about what you get
+to read for free with each request. In this particular case, there was enough
+cache line left to store another 11 floating point values, which are used as a
+place to store something akin to skip-list.
+
+<P>
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER" COLSPAN=2><SPAN>times</SPAN></TD>
+<TD ALIGN="CENTER" COLSPAN=2><SPAN>keys</SPAN></TD>
+<TD ALIGN="CENTER">n</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> s0</FONT> </TD>
+<TD ALIGN="CENTER">s1</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> s2</FONT>  </TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="CENTER">s3</TD>
+<TD ALIGN="CENTER">[HTML]000000
+<FONT COLOR="#000000"> s4</FONT></TD>
+<TD ALIGN="CENTER">s5</TD>
+<TD ALIGN="CENTER">[HTML]000000
+<FONT COLOR="#000000"> s6</FONT></TD>
+<TD ALIGN="CENTER">s7</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> s8</FONT> </TD>
+<TD ALIGN="CENTER">s9</TD>
+<TD ALIGN="CENTER">[HTML]000000 
+<FONT COLOR="#000000"> s10</FONT> </TD>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN=-2 WIDTH=1><SPAN><</SPAN>#3902#></TD>
+</TR>
+</TABLE>
+<P>
+<BR>
+<IMG
+ WIDTH="595" HEIGHT="374" ALIGN="BOTTOM" BORDER="0"
+ SRC="img30.png"
+ ALT="\begin{linespread}{0.75}\lstinputlisting[language=C,caption={Better cache line utilisation},label=src:animclu]{src/SRCH_LinearSkipping.cpp}\end{linespread}">
+<BR>
+
+<P>
+Using the fact that these keys would be loaded into memory, we give ourselves
+the opportunity to interrogate some data for free. In listing <A HREF="#src:animclu"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>
+you can see it uses a linear search instead of a binary search, and yet it
+still manages to make the original binary search look slow
+by comparison, and we must assume, as with most things on modern machines, it is because the path the
+code is taking is using the resources better, rather than being better
+in a theoretical way, or using fewer instructions.
+
+<P>
+<PRE>
+i5-4430 @ 3.00GHz
+Average 13.71ms [Full anim key - linear search]
+Average 11.13ms [Full anim key - binary search]
+Average  8.23ms [Data only key - linear search]
+Average  7.79ms [Data only key - binary search]
+Average  1.63ms [Pre-indexed - binary search]
+Average  1.45ms [Pre-indexed - linear search]
+</PRE>
+
+<P>
+If the reason for your search is simpler, such as checking for existence, then
+there are even faster alternatives. Bloom filters offer a constant time lookup.
+Even though it produces some false positives, it can be tweaked to generate a
+reasonable answer hit rate for very large sets. In particular, if you are
+checking for which table a row exists in, then bloom filters work very well, by
+providing data about which tables to look in, usually only returning the
+correct table, but sometimes more than one. The engineers at Google have used bloom filters to
+help mitigate the costs of something of a write-ahead approach with their
+BigTable technology[#!GoogleBigTable!#], and use bloom filters to quickly find out if data requests
+should lookup their values in recent change tables, or should go straight to
+the backing store.
+
+<P>
+In relational databases, indexes are added to tables at runtime when there are
+multiple queries that could benefit from their presence. For our data-oriented
+approach, there will always be some way to speed up a search but only by
+looking at the data. If the data is not already sorted, then an index is a
+simple way to find the specific item we need. If the data is already sorted,
+but needs even faster access, then a search tree optimised for the cache line
+size would help.
+
+<P>
+Most data isn't this simple to optimise. But importantly, when there is a lot
+of data, it usually is simple to learn patterns from it. A lot of the time, we
+have to work with spatial data, but because we use objects, it's hard to strap
+on an efficient spatial reference container after the fact. It's virtually
+impossible to add one at runtime to an externally defined class of objects.
+
+<P>
+Adding spatial partitioning when your data is in a simple data format like rows
+allows us to generate spatial containers or lookup systems that will be easy to
+maintain and optimise for each particular situation. Because of the inherent
+reusability in data-oriented transforms, we can write some very highly
+optimised routines for the high-level programmers.
+
+<P>
+
+<H1><A NAME="SECTION00730000000000000000">
+Finding lowest or highest is a sorting problem</A>
+</H1>
+
+<P>
+In some circumstances, you don't even really need to search. If the reason for
+searching is to find something within a range, such as finding the closest
+food, or shelter, or cover, then the problem isn't really one of searching, but
+one of sorting. In the first few runs of a query, the search might literally do
+a real search to find the results, but if it's run often enough, there is no
+reason not to promote the query to a runtime-updating sorted-subset of some
+other tables' data. If you need the nearest three elements, then you keep a
+sorted list of the nearest three elements, and when an element has an update,
+insertion or deletion, you can update the sorted three with that information.
+For insertions or modifications which bring elements that are not in the set
+closer, you can check whether the element is closer and pop the lowest before
+adding the new element to the sorted best. If there is a deletion or a
+modification that makes one in the sorted set a contender for elimination, a
+quick check of the rest of the elements to find a new best set might be
+necessary. If you keep a larger than necessary set of best values, however,
+then you might find this never happens.
+
+<P>
+<BR>
+<IMG
+ WIDTH="595" HEIGHT="273" ALIGN="BOTTOM" BORDER="0"
+ SRC="img31.png"
+ ALT="\begin{linespread}{0.75}\lstinputlisting[language=C,caption={keeping more than you need},label=src:keepingthree]{src/SRCH_BestThree.cpp}\end{linespread}">
+<BR>
+
+<P>
+The trick is to find, at runtime, the best value to use that covers the
+solution requirement. The only way to do that is to check the data at runtime.
+For this, either keep logs or run the tests with dynamic resizing based on
+feedback from the table's query optimiser.
+
+<P>
+
+<H1><A NAME="SECTION00740000000000000000">
+Finding random is a hash/tree issue</A>
+</H1>
+
+<P>
+For some tables, the values change very often. For a tree representation to be
+high performance, it's best not to have a high number of modifications as each
+one could trigger the need for a rebalance. Of course, if you do all your
+modifications in one stage of processing, then rebalance, and then all your
+reads in another, then you're probably going to be okay still using a tree.
+
+<P>
+The C++ standard template library implementation of map for your compiler might
+not work well even when committing all modifications in one go, but a more
+cache line aware implementation of a tree, such as a B-tree, may help you. A
+B-tree has much wider nodes, and therefore is much shallower. It also has a
+much lower chance of making multiple changes at once under insert and delete
+operations, as each node has a much higher capacity. Typically, you will see
+some form of balancing going on in a red-black tree every other insert or
+delete, but in most B-tree implementations, you will have tree rotations occur
+relative to the width of the node, and nodes can be very wide. For example,
+it's not unusual to have nodes with 8 child nodes.
+
+<P>
+If you have many different queries on some data, you can end up with multiple
+different indexes. How frequently the entries are changed should influence how
+you store your index data.  Keeping a tree around for each query could become
+expensive, but would be cheaper than a hash table in many implementations. Hash
+tables become cheaper where there are many modifications interspersed with
+lookups, trees are cheaper where the data is mostly static, or at least hangs
+around in one form for a while over multiple reads.
+
+<P>
+When the data becomes constant, a perfect hash can trump a tree.  Perfect hash
+tables use pre-calculated hash functions to generate an index and don't require
+any space other than what is used to store the constants and the array of pointers
+or offsets into the original table. If you have the time, then you might find a
+perfect hash that returns the actual indexes. It's not often you have that long
+though.
+
+<P>
+For example, what if we need to find the position of someone given their name?
+The players won't normally be sorted by name, so we need a name to player
+lookup. This data is mostly constant during the game so would be better to find
+a way to directly access it. A single lookup will almost always trump following
+a pointer chain, so a hash to find an array entry is likely to be the best fit.
+Consider a normal hash table, where each slot contains either the element
+you're looking for, or a different element, and a way of calculating the next
+slot you should check. If you know you want to do one and only one lookup, you
+can make each of your hash buckets as large as a cache line. That way you can
+benefit from free memory lookups.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html384"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html380"
+  HREF="dodmain.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html374"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html382"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html385"
+  HREF="node8.html">Sorting</A>
+<B> Up:</B> <A NAME="tex2html381"
+  HREF="dodmain.html">Data-Oriented Design</A>
+<B> Previous:</B> <A NAME="tex2html375"
+  HREF="node6.html">Hierarchical Level of Detail</A>
+ &nbsp; <B>  <A NAME="tex2html383"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<tt>Online release of Data-Oriented Design : <br>This is the free, online, reduced version. Some inessential chapters are excluded from this version, but in the spirit of this being an education resource, the essentials are present for anyone wanting to learn about data-oriented design.<br>Expect some odd formatting and some broken images and listings as this is auto generated and the Latex to html converters available are not perfect. If the source code listing is broken, you should be able to find the referenced source on <a href="https://github.com/raspofabs/dodbooksourcecode/">github</a>. If you like what you read here, consider purchasing the real paper book from <a href="https://www.amazon.com/dp/1916478700">here</a>, as not only will it look a lot better, but it will help keep this version online for those who cannot afford to buy it. Please send any feedback to <a href="mailto:support@dataorienteddesign.com">support@dataorienteddesign.com</a></tt><br>
+<ADDRESS>
+Richard Fabian
+2018-10-08
+</ADDRESS>
+</BODY>
+</HTML>

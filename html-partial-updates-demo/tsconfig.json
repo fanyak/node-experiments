@@ -1,6 +1,6 @@
 {
-  "include": ["./**/*", "tests/**/*"],
-  "compilerOptions": {
-    "types": ["node"]
-  }
+	"include": ["./**/*", "tests/**/*"],
+	"compilerOptions": {
+		"types": ["node"]
+	}
 }

@@ -15,3 +15,18 @@ export const MIME_TYPES = {
     xml: "application/xml",
     csv: "text/csv",
 };
+export const EXTENSION_TYPES = {
+    html: "html",
+    js: "js",
+    css: "css",
+    png: "png",
+    jpg: "jpg",
+    gif: "gif",
+    ico: "ico",
+    svg: "svg",
+    json: "json",
+    pdf: "pdf",
+    txt: "txt",
+    xml: "xml",
+    csv: "csv",
+};
