@@ -1,3 +1,6 @@
+import {envSchema} from "env-schema";
+import {Type, Static} from "typebox";
+
 export const noderegx = /^node(\d{1,2})$/;
 export const MIME_TYPES = {
 	default: "application/octet-stream",
@@ -31,3 +34,18 @@ export const EXTENSION_TYPES: { [key: string]: string } = {
 	xml: "xml",
 	csv: "csv",
 };
+
+
+export function validateAndLoadEnv() {
+	const schema = Type.Object({
+		localhost: Type.String(),
+		port: Type.Number({ minimum: 3000, maximum: 65535 }),
+		pathname: Type.String(),
+		DoDhost: Type.String(),
+		tagLimit: Type.Number({ minimum: 1, maximum: 13 }),
+		staticPath: Type.String(),
+	});
+	type Env = Static<typeof schema>;
+	const env: Env = envSchema({ schema });
+	return env;
+}

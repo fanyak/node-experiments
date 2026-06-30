@@ -1,13 +1,13 @@
 import http, { type Server } from "node:http";
 import { extname, join } from "node:path";
-import { loadEnvFile } from "node:process";
+//import { loadEnvFile } from "node:process";
 import closeWithGrace from "close-with-grace";
-import { noderegx, MIME_TYPES, EXTENSION_TYPES } from "./utils.js";
+import {validateAndLoadEnv, noderegx, MIME_TYPES, EXTENSION_TYPES } from "./utils.js";
 import { existsSync, createReadStream } from "node:fs";
 
 // load .env file to process.env object
-loadEnvFile();
-const { localhost, DoDhost, tagLimit, staticPath, port } = process.env;
+// loadEnvFile();
+const { localhost, DoDhost, tagLimit, staticPath, port } = validateAndLoadEnv();
 
 type NodeNumber<T> = T extends `node${infer N}` ? N : never;
 type ValidNodeTag = string & { __brand: "ValidNodeTag" };
