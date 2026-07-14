@@ -1,12 +1,12 @@
 import http, { type Server } from "node:http";
 import { extname, join } from "node:path";
-//import { loadEnvFile } from "node:process";
+import { loadEnvFile } from "node:process";
 import closeWithGrace from "close-with-grace";
 import {validateAndLoadEnv, noderegx, MIME_TYPES, EXTENSION_TYPES } from "./utils.js";
 import { existsSync, createReadStream } from "node:fs";
 
 // load .env file to process.env object
-// loadEnvFile();
+loadEnvFile();
 const { localhost, DoDhost, tagLimit, staticPath, port } = validateAndLoadEnv();
 
 type NodeNumber<T> = T extends `node${infer N}` ? N : never;
@@ -43,6 +43,7 @@ let isShuttingDown = false;
 
 function createHandler() {
 	return async (req: http.IncomingMessage, res: http.ServerResponse) => {
+		console.log(req.headers)
 		if (isShuttingDown) {
 			// Close previous HTTP: Connection : keep-alive sent by the client Request object.
 			res.setHeader("Connection", "close");

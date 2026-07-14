@@ -3,6 +3,10 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { loadEnvFile } from "node:process";
 
+import pLimit from 'p-limit';
+
+const limit = pLimit(5); // Max 5 concurrent operations
+
 loadEnvFile(); // load vars to process.env
 
 interface User {
@@ -73,7 +77,12 @@ function getTagLimit(tagLimit: string | undefined): TagLimit {
 	return parseInt(tagLimit) as TagLimit;
 }
 
-async function fetchNode(nodeTag: string): Promise<ApiResponse<Document>> {
+// No try/catch needed here because errors will be handled in Promise.allSettled() below.
+// Additionally, aborted promises will also be handled in Promise.allSettled() below, so no need to handle them here.
+async function getNodeDoc(nodeTag: string): Promise<ApiResponse<Document>> {
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+	console.log(parseInt(nodeTag.substring(4)))
 	const res: Response = await fetch(`${localhost}:${port}${pathname}?node=${nodeTag}`, {
 		method: "GET",
 		headers: {
@@ -82,7 +91,9 @@ async function fetchNode(nodeTag: string): Promise<ApiResponse<Document>> {
 					? "keep-alive"
 					: "close",
 		},
+		signal: controller.signal,
 	});
+	clearTimeout(timeout);
 	if (!res.ok) {
 		return {
 			type: "error",
@@ -95,6 +106,7 @@ async function fetchNode(nodeTag: string): Promise<ApiResponse<Document>> {
 		data,
 	};
 }
+
 // CLI logic
 
 const args = process.argv.slice(2);
@@ -116,7 +128,7 @@ if (args[0] === "all") {
 	);
 
 	const urls: Array<Promise<ApiResponse<Document>>> = nodeTags.map((nodeTag) =>
-		fetchNode(nodeTag),
+		limit(() => getNodeDoc(nodeTag)),
 	);
 
 	Promise.allSettled(urls)
@@ -131,6 +143,8 @@ if (args[0] === "all") {
 						if (current.value.type === "success") {
 							acc.push(current.value.data);
 						}
+					} else {
+						console.log(`Error fetching node: ${current.reason}`);
 					}
 					return acc;
 				},
@@ -147,11 +161,10 @@ if (args[0] === "all") {
 		.catch((error) => {
 			console.error("Error fetching nodes:", error);
 		});
-}
-
-if (noderegx.test(args[0])) {
+} 
+else if (noderegx.test(args[0])) {
 	const nodeTag = args[0];
-	fetchNode(nodeTag)
+	getNodeDoc(nodeTag)
 		.then((response) => {
 			if (response.type === "success") {
 				// return response to cli
@@ -164,4 +177,8 @@ if (noderegx.test(args[0])) {
 			// this will be called when server can't be reached
 			console.log("server error", error);
 		});
+}
+else {
+	console.error("Unknown argument. Please provide a valid node tag or 'all' as an argument.");
+	process.exit(1);
 }

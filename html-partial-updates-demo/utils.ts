@@ -35,7 +35,6 @@ export const EXTENSION_TYPES: { [key: string]: string } = {
 	csv: "csv",
 };
 
-
 export function validateAndLoadEnv() {
 	const schema = Type.Object({
 		localhost: Type.String(),
