@@ -7,7 +7,9 @@
 	"type": "module",
 	"scripts": {
 		"dev": "node server.js",
-		"test": "test"
+		"test": "test",
+		"build": "tsc -p tsconfig.json",
+		"clean": "rm -rf dist"
 	},
 	"dependencies": {
 		"@biomejs/biome": "2.4.13",
