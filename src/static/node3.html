@@ -1,0 +1,2241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<link href='http://fonts.googleapis.com/css?family=Lato:300,700,300italic,700italic' rel='stylesheet' type='text/css'>
+<TITLE>Relational Databases</TITLE>
+<META NAME="description" CONTENT="Relational Databases">
+<META NAME="keywords" CONTENT="dodmain">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="dodmain.css">
+
+<LINK REL="next" HREF="node4.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="dodmain.html">
+<LINK REL="next" HREF="node4.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html301"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html297"
+  HREF="dodmain.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html291"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html299"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html302"
+  HREF="node4.html">Existential Processing</A>
+<B> Up:</B> <A NAME="tex2html298"
+  HREF="dodmain.html">Data-Oriented Design</A>
+<B> Previous:</B> <A NAME="tex2html292"
+  HREF="node2.html">Data-Oriented Design</A>
+ &nbsp; <B>  <A NAME="tex2html300"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+<tt>Online release of Data-Oriented Design : <br>This is the free, online, reduced version. Some inessential chapters are excluded from this version, but in the spirit of this being an education resource, the essentials are present for anyone wanting to learn about data-oriented design.<br>Expect some odd formatting and some broken images and listings as this is auto generated and the Latex to html converters available are not perfect. If the source code listing is broken, you should be able to find the referenced source on <a href="https://github.com/raspofabs/dodbooksourcecode/">github</a>. If you like what you read here, consider purchasing the real paper book from <a href="https://www.amazon.com/dp/1916478700">here</a>, as not only will it look a lot better, but it will help keep this version online for those who cannot afford to buy it. Please send any feedback to <a href="mailto:support@dataorienteddesign.com">support@dataorienteddesign.com</a></tt><br>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html303"
+  HREF="node3.html#SECTION00310000000000000000">Complex state</A>
+<LI><A NAME="tex2html304"
+  HREF="node3.html#SECTION00320000000000000000">The framework</A>
+<LI><A NAME="tex2html305"
+  HREF="node3.html#SECTION00330000000000000000">Normalising your data</A>
+<LI><A NAME="tex2html306"
+  HREF="node3.html#SECTION00340000000000000000">Normalisation</A>
+<UL>
+<LI><A NAME="tex2html307"
+  HREF="node3.html#SECTION00341000000000000000">Primary keys</A>
+<LI><A NAME="tex2html308"
+  HREF="node3.html#SECTION00342000000000000000">1<SUP>st</SUP> Normal Form</A>
+<LI><A NAME="tex2html309"
+  HREF="node3.html#SECTION00343000000000000000">2<SUP>nd</SUP> Normal Form</A>
+<LI><A NAME="tex2html310"
+  HREF="node3.html#SECTION00344000000000000000">3<SUP>rd</SUP> Normal Form</A>
+<LI><A NAME="tex2html311"
+  HREF="node3.html#SECTION00345000000000000000">Boyce-Codd Normal Form</A>
+<LI><A NAME="tex2html312"
+  HREF="node3.html#SECTION00346000000000000000">Domain Key / Knowledge</A>
+<LI><A NAME="tex2html313"
+  HREF="node3.html#SECTION00347000000000000000">Reflections</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html314"
+  HREF="node3.html#SECTION00350000000000000000">Operations</A>
+<LI><A NAME="tex2html315"
+  HREF="node3.html#SECTION00360000000000000000">Summing up</A>
+<LI><A NAME="tex2html316"
+  HREF="node3.html#SECTION00370000000000000000">Stream Processing</A>
+<LI><A NAME="tex2html317"
+  HREF="node3.html#SECTION00380000000000000000">Why does database technology matter?</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00300000000000000000">
+Relational Databases</A>
+</H1>
+
+<P>
+In order to lay your data out better, it's useful to have an understanding of
+the methods available to convert your existing structures into something
+linear. The problems we face when applying data-oriented approaches to existing
+code and data layouts usually stem from the complexity of state inherent in
+data-hiding or encapsulating programming paradigms.  These paradigms hide away
+internal state so you don't have to think about it, but they hinder when
+it comes to reconfiguring data layouts.  This is not because they don't
+abstract enough to allow changes to the underlying structure without impacting
+the correctness of the code that uses it, but instead because they have
+connected and given meaning to the structure of the data. That type of coupling
+can be hard to remove.
+
+<P>
+In this chapter, we go over some of the pertinent parts of the relational
+model, relational database technology, and normalisation, as these are examples
+of converting highly complex data structures and relationships into very clean
+collections of linear storable data entries.
+
+<P>
+You certainly don't have to move your data to a database style to do
+data-oriented design, but there are many places where you will wish you had a
+simple array to work with, and this chapter will help you by giving you an
+example of how you can migrate from a web of connected complex objects to a
+simpler to reason about relational model of arrays.
+
+<P>
+
+<H1><A NAME="SECTION00310000000000000000">
+Complex state</A>
+</H1>
+
+<P>
+When you think about the data present in most software, it has some qualities
+of complexity or interconnectedness. When it comes to game development, there
+are many ways in which the game entities interact, and many ways in which
+their attached resources will need to feed through different stages of
+processes to achieve the audio, visual and sometimes haptic feedback necessary
+to fully immerse the player. For many programmers brought up on
+object-oriented design, the idea of reducing the types of structure available
+down to just simple arrays, is virtually unthinkable. It's very hard to go
+from working with objects, classes, templates, and methods on encapsulated
+data to a world where you only have access to linear containers.
+
+<P>
+In <SPAN  CLASS="textit">A Relational Model of Data for Large Shared Data
+Banks</SPAN>[#!RelationalModel!#], Edgar F. Codd proposed the relational model to
+handle the current and future needs of agents interacting with data. He
+proposed a solution to structuring data for insert, update, delete, and query
+operations.  His proposal claimed to reduce the need to maintain a deep
+understanding of how the data was laid out to use it well. His proposal also
+claimed to reduce the likelihood of introducing internal inconsistencies.
+<A NAME="352"></A>
+
+<P>
+The relational model provided a framework, and in <SPAN  CLASS="textit">Further
+Normalization of the Data Base Relational Model.</SPAN>[#!FurtherNormalization!#],
+Edgar F. Codd introduced the fundamental terms of normalisation we use to
+this day in a systematic approach to reducing the most complex of
+interconnected state information to linear lists of unique independent tuples.
+
+<P>
+
+<H1><A NAME="SECTION00320000000000000000">
+What can provide a computational framework for 
+complex data?</A>
+</H1>
+
+<P>
+Databases store highly complex data in a structured way and provide a
+language for transforming and generating reports based on that data. The
+language, SQL, invented in the 1970's by Donald D.  Chamberlin and Raymond F.
+Boyce at IBM, provides a method by which it is possible to store computable
+data while also maintaining data relationships following in the form of the
+relational model. Games don't have simple computable data, they have classes
+and objects. They have guns, swords, cars, gems, daily events, textures,
+sounds, and achievements. It is very easy to conclude that database technology
+doesn't work for the object-oriented approach game developers use.
+
+<P>
+The data relationships in games can be highly complex, it would seem at first
+glance that it doesn't neatly fit into database rows. A CD collection easily
+fits in a database, with your albums neatly arranged in a single table. But,
+many game objects won't fit into rows of columns. For the uninitiated, it can
+be hard to find the right table columns to describe a level file. Trying to
+find the right columns to describe a car in a racing game can be a puzzle. Do
+you need a column for each wheel? Do you need a column for each collision
+primitive, or just a column for the collision mesh?
+
+<P>
+An obvious answer could be that game data doesn't fit neatly into the database
+way of thinking. However, that's only because we've not normalised the data.
+To show how you can convert from a network model, or hierarchical model to what
+we need, we will work through these normalisation steps.  We'll start with a
+level file as we find out how these decades-old techniques can provide a very
+useful insight into what game data is really doing.
+
+<P>
+We shall discover that everything we do is already in a database, but it wasn't
+obvious to us because of how we store our data. The structure of any data is a
+trade-off between performance, readability, maintenance, future proofing,
+extendibility, and reuse. For example, the most flexible database in common use
+is your filesystem. It has one table with two columns. A primary key of the
+file path, and a string for the data. This simple database system is the
+perfect fit for a completely future proof system. There's nothing that can't be
+stored in a file. The more complex the tables get, the less future proof, and
+the less maintainable, but the higher the performance and readability. For
+example, a file has no documentation of its own, but the schema of a database
+could be all that is required to understand a sufficiently well-designed
+database. That's how games don't even appear to have databases. They are so
+complex, for the sake of performance, they have forgotten they are
+merely a data transform. This sliding scale of complexity affects scalability
+too, which is why some people have moved towards NoSQL databases, and document
+store types of data storage. These systems are more like a filesystem where the
+documents are accessed by name, and have fewer limits on how they are
+structured. This has been good for horizontal scalability, as it's simpler to
+add more hardware when you don't have to keep your data consistent across
+multiple tables that might be on different machines. There may come a day when
+memory is so tightly tied to the closest physical CPU, or when memory chips
+themselves get more processing power, or running 100 SoCs inside your desktop
+rig is more effective than a single monolithic CPU, that moving to document
+store at the high-level could be beneficial inside your app, but for now, there
+do not seem to be any benefits in that processing model for tasks on local
+hardware.
+
+<P>
+We're not going to go into the details of the lowest level of how we utilise
+large data primitives such as meshes, textures, sounds and such.  For now,
+think of these raw assets (sounds, textures, vertex buffers, etc.) as
+primitives, much like the integers, floating point numbers, strings and boolean
+values we shall be working with. We do this because the relational model calls
+for atomicity when working with data. What is and is not atomic has been
+debated without an absolute answer becoming clear, but for the intents of
+developing software intended for human consumption, the granularity can be
+rooted in considering the data from the perspective of human perception. There
+are existing APIs that present strings in various ways depending on how they
+are used, for example the difference between human-readable strings (usually
+UTF-8) and ASCII strings for debugging. Adding sounds, textures, and meshes to
+this seems quite natural once you realise all these things are resources
+which if cut into smaller pieces begin to lose what it is that makes them what
+they are.  For example, half of a sentence is a lot less useful than a whole
+one, and loses integrity by disassociation. A slice of a sentence is clearly
+not reusable in any meaningful way with another random slice of a different
+sentence.  Even subtitles are split along meaningful boundaries, and it's this
+idea of meaningful boundary that gives us the our definition of atomicity for
+software developed for humans. To this end, when working with your data, when
+you're normalising, try to stay at the level of nouns, the nameable pieces. A
+whole song can be an atom, but so is a single tick sound of a clock. A whole
+page of text is an atom, but so is the player's gamer-tag.
+
+<P>
+
+<H1><A NAME="SECTION00330000000000000000">
+Normalising your data</A>
+</H1>
+
+<P>
+<BR>
+<BR>
+<BR>
+
+<DIV ALIGN="CENTER"><A NAME="360"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Visual representation of the setup script</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<BR>
+<BR>
+<BR>
+
+<P>
+We're going to work with a level file for a game where you hunt for keys to
+unlock doors in order to get to the exit room. The level file is a sequence of
+script calls which create and configure a collection of different game objects
+which represent a playable level of the game, and the relationships between
+those objects. First, we'll assume it contains rooms (some trapped, some
+not), with doors leading to other rooms which can be locked. It will also
+contain a set of pickups, some let the player unlock doors, some 
+affect the player's stats (like health potions and armour), and all the rooms
+have lovely textured meshes, as do all the pickups. One of the rooms is marked
+as the exit, and one has a player start point.
+
+<P>
+<BR>
+<IMG
+ WIDTH="595" HEIGHT="615" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="\begin{linespread}{0.75}\lstinputlisting[language=C,caption={A setup script},label=src:roomscript]{src/RDB-setup.cpp}\end{linespread}">
+<BR>
+
+<P>
+In this setup script (Listing <A HREF="#src:roomscript"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>) we load some resources,
+create some pickup prototypes, build up a few rooms, add some instances to the
+rooms, and then link things together. Here we also see a standard solution to
+the problem of things which reference each other. We create the rooms before we
+connect them to each other because before they exist we can't. When we create
+entities in C++, we assume they are bound to memory, and the only efficient way
+to reference them is through pointers, but we cannot know where they exist in
+memory before we allocate them, and we cannot allocate them before filling them
+out with their data as the allocation and initialisation are bound to
+each other through the `new' mechanism. This means we have difficulty
+describing relationships between objects before they exist and have to
+stagger the creation of content into phases of setting up and connecting things
+together.
+
+<P>
+To bring this setup script into a usable database-like format, or relational
+model, we will need to normalise it. When putting things in a relational model
+of any sort, it needs to be in tables. In the first step you take all the data
+and put it into a very messy, but hopefully complete, table design. In our case
+we take the form of the data from the object creation script and fit it into a
+table. The asset loading can be directly translated into tables, as can be seen
+in table <A HREF="#tab:assets"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="445"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Initial tables created by converting asset load calls</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Meshes 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>MeshID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshName </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+msh_rm </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roommesh"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+msh_rmstart </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roommeshstart"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+msh_rmtrap </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roommeshtrapped"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"keymesh"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+msh_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"potionmesh"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+msh_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"armourmesh"</TT> </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+Textures 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>TextureID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureName </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+tex_rm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roomtexture"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_rmstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roomtexturestart"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_rmtrapped</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roomtexturetrapped"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"keytexture"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"potiontexture"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"armourtexture"</TT> </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+Animations 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>AnimID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">AnimName </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+anim_keybob</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"keybobanim"</TT> </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:assets"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Primed with this data, it's now possible for us to create the Pickups. We
+convert the calls to CreatePickup into the tables in table <A HREF="#tab:pickups"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>.
+Notice that there was a pickup which did not specify a colour tint, and this
+means we need to use a NULL to represent not giving details about that aspect
+of the row. The same applies to animations. Only keys had animations, so there
+needs to be NULL entries for all non-key rows.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="468"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Initial tables created by converting CreatePickup calls</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Pickups 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<SPAN  CLASS="textbf">PickupID</SPAN></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">PickupType</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ColourTint</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Anim</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Copper</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">anim_keybob </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Silver</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">anim_keybob </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Gold</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">anim_keybob </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Green</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Purple</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+a1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ARMOUR</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:pickups"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Once we have loaded the assets and have created the pickup prototypes, we move onto
+creating a table for rooms. We need to invent attributes as necessary using 
+NULL everywhere that an instance doesn't have that attribute. We convert the
+calls to CreateRoom, AddDoor, SetRoomAsSpecial, and AddPickup, to columns in
+the Rooms table. See table <A HREF="#tab:rooms"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> for one way to build up a table that
+represents all those setup function calls.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="488"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Initial table created by converting CreateRoom and other calls.</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Rooms 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<SPAN  CLASS="textbf">RoomID</SPAN></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WorldPos</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Pickups</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">... </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rmstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">  0, 0</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL    </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">... </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rmtrap </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmtrap </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-20,10</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k1      </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">... </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rm     </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rm     </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-10,20</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k2,p1,a1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">... </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rm     </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rm     </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-30,20</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k3,p2   </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">... </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rmtrap </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmtrap </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 20,10</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL    </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">... </SMALL></TD>
+</TR>
+</TABLE><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+...</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">DoorsTo</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Locked</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">IsStart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">IsEnd </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+...</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r2,r3   </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r3 with k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true WorldPos(1,1)</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+...</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">10HP</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r1,r4   </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r4 with k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false             </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+...</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r1,r2,r5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r5 with k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false             </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+...</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r2      </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">          </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false             </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+...</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">25HP</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL    </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">          </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false             </SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:rooms"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Once we have taken the construction script and generated these first tables, we
+find the tables contain a lot of NULLs. The NULLs in the rows replace
+the optional content of the objects. If an object instance doesn't have a
+certain attribute then we replace those features with NULLs. There are also
+elements which contain more than one item of data. Having multiple doors per
+room is tricky to handle in this table. How would you figure out what doors it
+had? The same goes for whether the door is locked, and whether there are any
+pickups. The first stage in normalising is going to be reducing the number of
+elements in each cell to 1, and increasing it to 1 where it's currently NULL.
+
+<P>
+
+<H1><A NAME="SECTION00340000000000000000">
+Normalisation</A>
+</H1>
+
+<P>
+Back when SQL was first created there were only three well-defined stages of
+data normalisation. There are many more now, including six numbered normal
+forms. To get the most out of a database, it is important to know most of them,
+or at least get a feel for why they exist. They teach you about data dependency
+and can hint at reinterpretations of your data layout. For game structures,
+BCNF (Boyce-Codd normal form is explained later) is probably as far as you
+normally would need to take your methodical
+process. Beyond that, you might wish to normalise your data for hot/cold
+access patterns, but that kind of normalisation is not part of the standard
+literature on database normalisation. If you're interested in more than this
+book covers on the subject, a very good read, and one which introduces the
+phrase ``The key, the whole key, and nothing but the key." is the article
+<SPAN  CLASS="textit">A Simple Guide to Five Normal Forms in Relational Database
+Theory</SPAN>[#!FiveEasyNormalization!#] by William Kent.
+
+<P>
+If a table is in first normal form, then every cell contains one and only one
+atomic value. That is, no arrays of values, and no NULL entries. First normal
+form also requires every row be distinct. For those unaware of what a primary
+key is, we shall discuss that first.
+
+<P>
+
+<H2><A NAME="SECTION00341000000000000000">
+Primary keys</A>
+</H2>
+
+<P>
+All tables are made up of rows and columns. In a database, each row must be
+unique. This constraint has important consequences.  When you have normalised
+your data, it becomes clear why duplicate rows don't make sense, but for now,
+from a computer programming point of view, consider tables to be more like
+sets, where the whole row is the set value. This is very close to reality, as
+sets are also not ordered, and a database table is not ordered either.  There
+is always some differentiation between rows, even if a database management
+system (DBMS) has to rely on hidden row ID values. It is better to not rely on
+this as databases work more efficiently when the way in which they are used
+matches their design.  All tables need a key. The key is often used to order
+the sorting of the table in physical media, to help optimise queries. For this
+reason, the key needs to be unique, but as small as possible. You can think of
+the key as the key in a map or dictionary.  Because of the uniqueness rule, every table has
+an implicit key because the table can use the combination of all the columns at
+once to identify each row uniquely.  That is, the key, or the unique lookup,
+which is the primary key for a table, can be defined as the totality of the
+whole row.  If the row is unique, then the primary key is unique. Normally, we
+try to avoid using the whole row as the primary key, but sometimes, it's
+actually our only choice. We will come across examples of that later.
+
+<P>
+For example, in the mesh table, the combination of meshID and filename is
+guaranteed to be unique. However, currently it's only guaranteed to be unique
+because we have presumed that the meshID is unique. If it was the same mesh,
+loaded from the same file, it could still have a different meshID. The same can
+be said for the textureID and filename in the textures table. From the
+table <A HREF="#tab:pickups"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> it's possible to see how we could use the type, mesh,
+texture, tint and animation to uniquely define each Pickup prototype.
+
+<P>
+Now consider rooms. If you use all the columns other than the RoomID of the
+room table, you will find the combination can be used to uniquely define
+the room. If you consider an alternative, where a row had the same combination
+of values making up the room, it would in fact be describing the same room.
+From this, it can be claimed that the RoomID is being used as an alias for the
+rest of the data. We have stuck the RoomID in the table, but where did it come
+from? To start with, it came from the setup script. The script had a RoomID,
+but we didn't need it at that stage. We needed it for the destination of the
+doors. In another situation, where nothing connected logically to the room, we
+would not need a RoomID as we would not need an alias to it.
+
+<P>
+A primary key must be unique. RoomID is an example of a primary key because it
+uniquely describes the room. It is an alias in this sense as it contains no
+data in and of itself, but merely acts as a handle. In some cases the
+primary key is information too, which again, we will meet later.
+
+<P>
+As a bit of an aside, the idea that a row in a database is also the key can be
+a core concept worth spending time thinking about. If a database table is a
+set, when you insert a record, you're actually just asking that one particular
+combination of data is being recorded as existing. It is as if a database table
+is a very sparse set from an extremely large domain of possible values. This
+can be useful because you may notice that under some circumstances, the set of
+possible values isn't very large, and your table can be more easily defined as
+a bit set. As an example, consider a table which lists the players in an MMO
+that are online right now. For an MMO that shards its servers, there can be
+limits in the early thousands for the number of unique players on each server.
+In that case, it may be easier to store the currently online players as a bit
+set. If there are at most 10,000 players online, and only 1000 players online
+at any one time, then the bitset representation would take up 1.25kb of memory,
+whereas storing the online players as a list of IDs, would require at least 2kb
+of data if their IDs were shrunk to shorts, or 4kb if they had 32bit IDs to
+keep them unique across multiple servers. The other benefit in this case is
+the performance of queries into the data. To quickly access the ID in the list,
+you need it to remain sorted. The best case then is <!-- MATH
+ $\mathcal{O}(\log{}n)$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="62" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.png"
+ ALT="$ \mathcal{O}(\log{}n)$"></SPAN>. In
+the bitset variant, it's <!-- MATH
+ $\mathcal{O}(1)$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="37" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img5.png"
+ ALT="$ \mathcal{O}(1)$"></SPAN>.
+
+<P>
+Going back to the asset table, an important and useful detail when we talk
+about the meshID and mesh filename is that even though there could be two
+different meshIDs pointing at the same file, most programmers would intuitively
+understand that a single meshID was unlikely to point at two different mesh
+files. Because of this asymmetry, you can deduce, the column that seems
+more likely to be unique will also be the column you can use as the
+primary key. We'll choose the meshID as it is easier to manipulate and is
+unlikely to have more than one meaning or usage, but remember, we could
+have chosen the filename and gone without the meshID altogether. 
+
+<P>
+If we settle on TextureID, PickupID, and RoomID as the primary keys for those
+tables, we can then look at continuing on to first normal form. We're using <TT>t1</TT>,
+<TT>m2</TT>, <TT>r3</TT>, etc. to show typesafe ID values, but in reality, these can all be simple
+integers. The idea here is to remain readable, but it also shows that each type
+can have unique IDs for that type, but have common IDs with another.  For
+example, a room may have an integer ID value of 0, but so may a texture. It can
+be beneficial to have IDs which are unique across types, as that can help
+debugging, and using the top few bits in that case can be helpful. If you're
+unlikely to have more than a million entities per class of entity, then you
+have enough bits to handle over a thousand distinct classes.
+
+<P>
+
+<H2><A NAME="SECTION00342000000000000000">
+1<SUP>st</SUP> Normal Form</A>
+</H2>
+
+<P>
+First normal form can be described as making sure the tables are not sparse. We
+require that there be no NULL pointers and that there be no arrays of data in
+each element of data. This can be performed as a process of moving the repeats
+and all the optional content to other tables. Anywhere there is a NULL, it
+implies optional content. Our first fix is going to be the Pickups table, it
+has optional ColourTint and Animation elements. We invent a new table
+PickupTint, and use the primary key of the Pickup as the primary key of the new
+table. We also invent a new table PickupAnim. Table <A HREF="#tab:pickups-1nf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> shows
+the result of the transformation, and note we no longer have any NULL
+entries.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="558"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Pickups in 1NF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Pickups
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">PickupType</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_mpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_mpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+a1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_marm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ARMOUR </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+PickupTints
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ColourTint</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Copper</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Silver</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Gold</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Green</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Purple</SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+PickupAnims
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Anim</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">anim_keybob</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">anim_keybob</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">anim_keybob</SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:pickups-1nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Two things become evident at this point, firstly that normalisation appears to
+create more tables and fewer columns in each table, secondly that there are
+only rows for things which matter. The former is worrisome, as it means more
+memory usage. The latter is interesting as when using an object-oriented
+approach, we allow objects to optionally have attributes. Optional attributes
+cause us to check they are not NULL before continuing. If we store data
+like this, then we know everything is not NULL. Moving away from having to
+do a null check at all will make your code more concise, and you have less
+state to consider when trying to reason about your systems.
+
+<P>
+Let's move onto the Rooms table. In there we saw single elements that contained
+multiple atomic values. We need to remove all elements from this table that do
+not conform to the rules of first normal form. First, we remove reference to
+the pickups, as they had various quantities of elements, from none to many.
+Then we must consider the traps, as even though there was only ever one trap,
+there wasn't always a trap. Finally, we must strip out the doors, as even
+though every room has a door, they often had more than one. Remember that the
+rule is one and only one entry in every meeting of row and column. In table
+<A HREF="#tab:rooms-1nf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> it shows how we only keep columns that are in a one to one
+relationship with the RoomID.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="583"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Rooms table now in 1NF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Rooms 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>RoomID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WorldPos</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">IsStart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">IsExit</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rmstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">0,0</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rmtrap</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmtrap</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-20,0</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-10,20</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-30,20</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_rmtrap</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmtrap</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">20,10</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true</SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:rooms-1nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Now we will make new tables for Pickups, Doors, and Traps. In table
+<A HREF="#tab:roomsother-1nf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> we see many decisions made to satisfy the first normal
+form.  We have split out the array like elements into separate rows. Note the
+use of multiple rows to specify the numerous pickups all in the same room.  We
+see that doors now need two tables. The first table to identify where the
+doors are, and where they lead. The second table seems to do the same, but
+doesn't cover all doors, only the ones that are locked. What's actually
+happening here is a need to identify doors by their primary key in the locked
+doors table. If you look at the Doors table, you can immediately tell that
+neither column is a candidate for the primary key, as neither contain only
+unique values. What is unique though is the combination of values, so the
+primary key is made up of both columns. In the table LockedDoors, FromRoom and
+ToRoom are being used as a lookup into the Doors table. This is often called a
+foreign key, meaning that there exists a table for which these columns directly
+map to that table's primary key. In this case, the primary key is made up of
+two columns, so the LockedDoors table has a large foreign key and a small bit
+of extra detail about that entry in the foreign table.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="620"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Additional tables to support 1NF rooms</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">PickupInstances 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>RoomID</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>PickupID </B></SMALL></TH>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k1 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k2 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">a1 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">p1 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k3 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">p2 </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+Doors 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>FromRoom</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>ToRoom </B></SMALL></TH>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r2 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r3 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r1 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r4 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r1 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r2 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r5 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r2 </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+LockedDoors 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>FromRoom</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>ToRoom</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">LockedWith </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k1 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k2 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">k3 </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+Traps 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>RoomID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Trapped </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">10hp </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">25hp </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:roomsother-1nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Laying out the data in this way takes less space in larger projects as the number
+of NULL entries or arrays would have only increased with increased complexity of the
+level file. By laying out the data this way, we can add new features
+without having to revisit the original objects. For example, if we wanted to
+add monsters, normally we would not only have to add a new object for the
+monsters, but also add them to the room objects. In this format, all we need to
+do is add a new table such as in table <A HREF="#tab:monster"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="651"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Adding monsters</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Monsters 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>MonsterID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Attack</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">HitPoints</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">StartRoom </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+M1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r3 </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+M2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">r4 </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:monster"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+And now we have information about the monster and what room it starts in
+without touching any of the original level data.
+
+<P>
+
+<H2><A NAME="SECTION00343000000000000000">
+2<SUP>nd</SUP> Normal Form</A>
+</H2>
+
+<P>
+Second normal form is about trying to pull out columns that don't depend on
+only a part of the primary key.  This can be caused by having a table that
+requires a compound primary key, and some attributes of the row only being
+dependent on part of that compound key. An example might be where you have
+weapons defined by quality and type, and the table looks like that in table
+<A HREF="#tab:weapon-1nf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>, what you can see is that the primary key must be
+compound, as there are no columns with unique values here.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="662"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Weapons in 1NF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Weapons
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>WeaponType</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>WeaponQuality</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WeaponDamage</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WeaponDamageType </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Rusty</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Slashing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Average</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d6</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Slashing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Masterwork</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d8</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Slashing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Lance</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Average</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d6</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Piercing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Lance</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Masterwork</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">3d6</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Piercing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Hammer</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Rusty</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Crushing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Hammer</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Average</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d4+4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Crushing </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:weapon-1nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+It makes sense for us looking at the table that the primary key should be the
+compound of WeaponType and WeaponQuality, as it's a fairly obvious move for us
+to want to look up damage amount and damage type values based on what weapon
+we're using. It's also possible to notice that the DamageType does not depend
+on the WeaponQuality, and in fact only depends on the WeaponType. That's what
+we mean about depending on part of the key. Even though each weapon is defined
+in 1NF, the type of damage being dealt currently relies on too little of the
+primary key to allow this table to remain in 2NF. We split the table out in
+table <A HREF="#tab:weapon-2nf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> to remove the column that only relies on
+WeaponType. If we found a weapon that changed DamageType based on quality, then
+we would put the table back the way it was. An example might be the <SPAN  CLASS="textit">badly damaged
+morningstar</SPAN>, which no longer does piercing damage, but only bludgeons.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="678"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Weapons in 2NF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Weapons
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>WeaponType</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>WeaponQuality</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WeaponDamage</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Rusty</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d4</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Average</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d6</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Masterwork</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d8</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Lance</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Average</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d6</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Lance</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Masterwork</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">3d6</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Hammer</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Rusty</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d4</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Hammer</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Average</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">2d4+4</SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+WeaponDamageTypes
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>WeaponType</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WeaponDamageType </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+Sword</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Slashing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Lance</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Piercing </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+Hammer</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Crushing </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:weapon-2nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+When considering second normal form for our level data, it's worth
+understanding some shortcuts we made in moving to first normal form. Firstly,
+we didn't necessarily need to move to having a PickupID, but instead could have
+referenced the pickup prototype by PickupType and TintColour, but that was
+cumbersome, and would have introduced a NULL as a requirement as the armour
+doesn't have a tint. Table <A HREF="#tab:pickups-alt"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A> shows how this may have
+looked, but the complications with making this connect to the rooms was the
+deciding factor for introducing a PickupID. Without the pickup ID, the only way
+to put the pickups in rooms was to have two tables. One table for pickups with
+tints, and another for pickups without tints. This is not absurd, but it
+doesn't seem clean in this particular situation. There will be cases where this
+would be the right approach.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="743"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+An alternative 0NF and 1NF for Pickups</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Pickups
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>MeshID</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>TextureID</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>PickupType</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>ColourTint</B></SMALL></TH>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+mkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Copper </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+mkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Silver </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+mkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Gold </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+mpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Green </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+mpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Purple </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+marm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tarm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ARMOUR</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">NULL </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+Normalising to 1NF:
+<BR>
+<BR>
+<BR>
+Pickups 1NF
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupType</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">mkey</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tkey </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">mpot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tpot</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ARMOUR</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">marm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tarm</SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+TintedPickups 1NF
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupType</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>ColourTint</B></SMALL></TH>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Copper </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Silver </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Gold </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Green </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Purple </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:pickups-alt"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+If we now revisit the Pickup table from before, with the knowledge that the
+PickupID is an alias for the combination of PickupType and ColourTint, then we
+can apply the same transform we see when moving to 1NF in the alternative form.
+That is, of moving MeshID and TextureID to their own table, and depending only
+on PickupType, not the compound key of PickupType and ColourTint.
+
+<P>
+In table <A HREF="#tab:pickups-2nf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>, the assets elements now rely on the whole of
+their compound key, not just part of it.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="791"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Pickups in 2NF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Pickups
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">PickupType</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">KEY </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">POTION </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+a1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ARMOUR </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+PickupTints
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">ColourTint</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+k1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Copper</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Silver</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+k3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Gold</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Green</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+p2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">Purple</SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+PickupAssets
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupType</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshID</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_key </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+POTION</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_pot </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ARMOUR</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">msh_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_arm </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+PickupAnims
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>PickupType</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">AnimID</SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+KEY</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">key_bob </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:pickups-2nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+We can't apply the same normalisation of table data to the Room table. The Room
+table's RoomID is an alias for the whole row, possibly, or just the WorldPos,
+but in both cases, it's possible to see a correlation between the MeshID,
+TextureID, and the value of IsStart. The problem is that it also relies on the
+existence of entries in an external table. If we take the table as it is, the
+MeshID and TextureID do not directly rely on anything other than the RoomID in
+this form.
+
+<P>
+
+<H2><A NAME="SECTION00344000000000000000">
+3<SUP>rd</SUP> Normal Form</A>
+</H2>
+
+<P>
+When considering further normalisation, we first have to remove any transitive
+dependencies. By this we mean any dependencies on the primary key only via
+another column in the row. We can do a quick scan of the current tables and see
+all resources references refer to pairs of MeshID and TextureID values.
+Anything that uses a MeshID will use the matching TextureID. This means we
+can pull out one or the other from all the tables that use them, and look them
+up via a table of pairs. We shall arbitrarily choose to use the TextureID as
+the main lookup, and slim down to one table for meshes and textures.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="833"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Assets in 3NF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">TexturesAndMeshes 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>TextureID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureName</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">MeshName </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+tex_room</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roomtexture"</TT></SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roommesh"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_roomstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roomtexturestart"</TT></SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roommeshstart"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_roomtrap</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roomtexturetrapped"</TT></SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"roommeshtrapped"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"keytexture"</TT></SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"keymesh"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"potiontexture"</TT></SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"potionmesh"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+tex_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"armourtexture"</TT></SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"armourmesh"</TT> </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:assets-3nf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<H2><A NAME="SECTION00345000000000000000">
+Boyce-Codd Normal Form</A>
+</H2>
+
+<P>
+The assets used for a room are based on whether it is trapped, or it's the
+starting room. This is a functional dependency, not a direct one, so we have to
+introduce a new column to describe that aspect, and it's going to require
+generating intermediate data to drive the value query, but it makes real the
+lack of direct link between the room and the assets. The rooms can be trapped,
+and can be starting rooms, and the assets connected to the room depend on those
+attributes, not the room itself. This is why Boyce-Codd Normal Form, or BCNF, can be thought of as the
+functionally dependent normalisation stage.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="860"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Rooms table now in BCNF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">Rooms 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>RoomID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">WorldPos</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">IsStart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">IsExit </SMALL></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+r1</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">0,0</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r2</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-20,10</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r3</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-10,20</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r4</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">-30,20</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false </SMALL></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+r5</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">20,10</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true </SMALL></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+<BR>
+<BR>
+<BR>
+Rooms 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>IsStart</B></SMALL></TH>
+<TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><B>HasTrap</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">TextureID </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+true</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmstart </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rm </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+false</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">true</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">tex_rmtrap </SMALL></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:rooms-BCNF"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<H2><A NAME="SECTION00346000000000000000">
+Domain Key / Knowledge</A>
+</H2>
+
+<P>
+Domain key normal form is normally thought of as the last normal form, but for
+developing efficient data structures, it's one of the things best
+studied early and often. The term <SPAN  CLASS="textit">domain knowledge</SPAN> is preferable when writing
+code as it makes more immediate sense and encourages use outside of keys and
+tables. Domain knowledge is the idea that data depends on other data, but only
+given information about the domain in which it resides. Domain knowledge can be
+as simple as awareness of a colloquialism for something, such as knowing that a
+certain number of degrees Celsius or Fahrenheit is hot, or whether some SI unit
+relates to a man-made concept such as 100m/s being rather quick.
+
+<P>
+An example of where domain knowledge can help with catching issues can be with
+putting human interpretations of values into asserts. Consider an assert for
+catching physics systems blowups. What is a valid expected range of values for
+acceleration? Multiply it by ten, and you have a check for when everything goes
+a bit crazy.
+
+<P>
+Some applications avoid the traditional inaccurate and erratic countdown timer,
+and resort to human-readable forms such as <SPAN  CLASS="textit">in a few minutes</SPAN> or
+<SPAN  CLASS="textit">time to grab a coffee</SPAN>, however domain knowledge isn't just about
+presenting a human interpretation of data. For example things such as the speed
+of sound, of light, speed limits and average speed of traffic on a given road
+network, psychoacoustic properties, the boiling point of water, and how long it
+takes a human to react to any given visual input. All these facts may be useful
+in some way, but can only be put into an application if the programmer adds it
+specifically as procedural domain knowledge or as an attribute of a specific
+instance.
+
+<P>
+Looking at our level data, one thing we can guess at is the asset
+filenames based on the basic name. The textures and meshes share a common
+format, so moving away from storing the full filenames could give us a Domain
+Knowledge normalised form.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="900"></A>
+<TABLE>
+<CAPTION><STRONG>Table:</STRONG>
+Assets in DKNF</CAPTION>
+<TR><TD><SMALL CLASS="FOOTNOTESIZE">AssetLookupTable 
+<BR></SMALL><TABLE CELLPADDING=3 BORDER="1">
+<TR><TH ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">
+<B>AssetID</B></SMALL></TH>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE">StubbedName </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+
+ast_room</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"room%s"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ast_roomstart</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"room%sstart"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ast_roomtrap</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"room%strapped"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ast_key</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"key%s"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ast_pot</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"potion%s"</TT> </SMALL></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"> 
+ast_arm</SMALL></TD>
+<TD ALIGN="LEFT"><SMALL CLASS="FOOTNOTESIZE"><TT>"armour%s"</TT> </SMALL></TD>
+</TR>
+</TABLE><SMALL CLASS="FOOTNOTESIZE">
+
+<A NAME="tab:assets-dknf"></A></SMALL></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Domain knowledge is useful because it allows us to lose some otherwise
+unnecessarily stored data. It is a compiler's job to analyse the produced
+output of code (the abstract syntax tree) to then provide itself with data upon
+which it can infer and use its domain knowledge about what operations can be
+omitted, reordered, or transformed to produce faster or cheaper assembly. It's
+our job to do the same for elements the compiler can't know about, such as
+the chance that someone in the middle of a fight is going to be able to hear a
+coin drop in another room.
+
+<P>
+Domain knowledge is what leads to inventions such as JPEG and MP3. Thinking
+about what is possible, what is possible to perceive, and what can possibly be
+affected by user actions, can reduce the amount of work done by an application,
+and can reduce its complexity. When you jump in a game with physics, we don't
+move the world down by fractions of a nanometre to represent the opposite
+reaction caused by the forces applied.
+
+<P>
+
+<H2><A NAME="SECTION00347000000000000000">
+Reflections</A>
+</H2>
+
+<P>
+What we see here as we normalise our data is a tendency to split data by
+dependency.  Looking at many third party engines and APIs, you can see some
+parallels with the results of these normalisations. It's unlikely that the
+people involved in the design and evolution of these engines took their data
+and applied database normalisation techniques, but sometimes the separations
+between object and components of objects can be obvious enough that you don't
+need a formal technique in order to realise some positive structural changes.
+
+<P>
+In some games, the entity object is not just an object that can be anything,
+but is instead a specific subset of the types of entity involved in the game.
+For example, in one game there might be a class for the player character, and
+one for each major type of enemy character, and another for vehicles.  The
+player may have different attributes to other entities, such as lacking AI
+controls, or having player controls, or having regenerating health, or having
+ammo. This object-oriented approach puts a line, invisible to the user, but
+intrusive to the developer, between classes of object and their instances. It
+is intrusive because when classes touch, they have to adapt to each other. When
+they don't reside in the same hierarchy, they have to work through abstraction
+layers to message each other. The amount of code required to bridge these gaps
+can be small, but they always introduce complexity.
+
+<P>
+When developing software, this usually manifests as time spent writing out
+templated code that can operate on multiple classes rather than refactoring the
+classes involved into more discrete components. This could be considered wasted
+time as the likelihood of other operations needing to operate on all the
+objects is greater than zero, and the effort to refactor into components is
+usually similar to the effort to create a working templated operation.
+
+<P>
+Without classes to define boundaries, the table-based approach levels the
+playing field for data to be manipulated together. In all cases on our journey
+through normalising the level data, we have made it so changes to the
+design require fewer changes to the data, and made it so data changes are
+less likely to cause the state to become inconsistent. In many cases, it would
+seem we have added complexity when it wasn't necessary, and that's up to
+experimentation and experience to help you decide how far to go.
+
+<P>
+
+<H1><A NAME="SECTION00350000000000000000">
+Operations</A>
+</H1>
+
+<P>
+When you use objects, you call methods on them, so how do you unlock a door in
+this table-based approach? Actions are always going to be insert, delete, or
+updates. These were clearly specified in Edgar F. Codd's works, and they are
+all you need to manipulate a relational model.
+
+<P>
+In a real database, finding what mesh to load, or whether a door is locked
+would normally require a join between tables. A real database would also
+attempt to optimise the join by changing the sequence of operations until it
+had made the smallest possible expected workload. We can do better than that
+because we can take absolute charge of how we look at and request data from our
+tables. To find out if a door is locked, we don't need to join tables, we 
+know we can look up into the locked doors table directly. Just because the
+data is laid out like a database, doesn't mean we have to use a query language
+to access it.
+
+<P>
+When it comes to operations that change state, it's best to try to stick to the
+kind of operation you would normally find in a DBMS, as doing unexpected
+operations brings unexpected state complexity. For example, imagine you
+have a table of doors that are open, and a table of doors that are closed.
+Moving a door from one table might be considered wasteful, so you may consider
+changing the representation to a single table, but with all closed doors at one
+end, and all open at the other.  By having both tables represented as a single
+table, and having the <SPAN  CLASS="textit">isClosed</SPAN> attribute defined implicitly by a
+cut-off point in the array, such as in listing <A HREF="#src:closedCutoff"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="icons/crossref.png"></A>, leads to
+the table being somewhat ordered. This type of memory optimisation comes at a
+price. Introducing order into a table makes the whole table inherently less
+parallelisable to operations, so beware the additional complexity introduced by
+making changes like this, and document them well.
+
+<P>
+<BR>
+<IMG
+ WIDTH="594" HEIGHT="155" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.png"
+ ALT="\begin{linespread}{0.75}\lstinputlisting[language=C,caption={Abusing the ordered...
+...e of a vector},label=src:closedCutoff]{src/RDB-closedCutoff.cpp}\end{linespread}">
+<BR>
+
+<P>
+Unlocking a door can be a delete. A door is locked because there is an entry in
+the LockedDoors table that matches the Door you are interested in. Unlocking a
+door is a delete if door matches, and you have the right key. 
+
+<P>
+The player inventory would be a table with just PickupIDs. This is the idea that <SPAN  CLASS="textit">"the primary
+key is also the data"</SPAN> mentioned much earlier. If the player enters a
+room and picks up a Pickup, then the entry matching the room is deleted while
+the inventory is updated to include the new PickupID.
+
+<P>
+Databases have the concept of triggers, whereupon operations on a table can
+cause cascades of further operations. In the case of picking up a key, we would
+want a trigger on insert into the inventory that joined the new PickupID with
+the LockedDoors table. For each matching row there, delete it, and now the
+door is unlocked. 
+
+<P>
+
+<H1><A NAME="SECTION00360000000000000000">
+Summing up</A>
+</H1>
+
+<P>
+At this point we can see it is perfectly reasonable to store any highly complex
+data structures in a database format, even game data with its high
+interconnectedness and rapid design changing criteria.
+
+<P>
+Games have lots of state, and the relational model provides a strong structure
+to hold both static information, and mutable state. The strong structure leads
+to similar solutions to similar problems in practise, and similar solutions
+have similar processing. You can expect algorithms and techniques to be more
+reusable while  working with tables, as the data layout is less surprising.
+
+<P>
+If you're looking for a way to convert your interconnected complicated objects
+into a simpler flatter memory layout, you could do worse than approach the
+conversion with normalisation in mind.
+
+<P>
+A database approach to data storage has some other useful side-effects. It
+provides an easier route to allowing old executables to run off new data, and
+it allows new executables to more easily run with old data. This can be vital
+when working with other people who might need to run an earlier or later
+version. We saw that sometimes adding new features required nothing more than
+adding a new table, or a new column to an existing table. That's a
+non-intrusive modification if you are using a database style of storage, but a
+significant change if you're adding a new member to a class. 
+
+<P>
+
+<H1><A NAME="SECTION00370000000000000000">
+Stream Processing</A>
+</H1>
+
+<P>
+Now we realise that all the game data and game runtime can be implemented in a
+database-like approach, we can also see that all game data can be
+implemented as streams. Our persistent storage is a database, our runtime data
+is in the same format as it was on disk, what do we benefit from this?
+Databases can be thought of as collections of rows, or collections of columns,
+but it's also possible to think about the tables as sets. The set is the set of
+all possible permutations of the attributes.
+
+<P>
+For most applications, using a bitset to represent a table would be wasteful,
+as the set size quickly grows out of scope of any hardware, but it can be
+interesting to note what this means from a processing point of view. Processing
+a set, transforming it into another set, can be thought of as traversing the
+set and producing the output set, but the interesting attribute of a set is
+that it is unordered. An unordered list can be trivially parallel processed.
+There are massive benefits to be had by taking advantage of this trivialisation
+of parallelism wherever possible, and we normally cannot get near this because
+of the data layout of the object-oriented approaches.
+
+<P>
+Coming at this from another angle, graphics cards vendors have been pushing in
+this direction for many years, and we now need to think in this way for game
+logic too. We can process lots of data quickly as long as we utilise stream
+processing or set processing as much as possible and use random access
+processing as little as possible. Stream processing in this case means to
+process data without writing to variables external to the process. This means
+not allowing things like global accumulators, or accessing global memory not
+set as a source for the process. This ensures the processes or transforms are
+trivially parallelisable.
+
+<P>
+When you prepare a primitive render for a graphics card, you set up constants
+such as the transform matrix, the texture binding, any lighting values, or
+which shader you want to run. When you come to run the shader, each vertex and
+pixel may have its own scratchpad of local variables, but they never write to
+globals or refer to a global scratchpad. The concept of shared memory in
+general purpose GPU code, such as CUDA and OpenCL, allows the use of a kind of
+managed cache. None of the GPGPU techniques offer access to global memory, and
+thus maintain a clear separation of domains and continue to guarantee no
+side-effects caused by any kernels being run outside of their own sandboxed
+shared memory.  By enforcing this lack of side-effects, we can guarantee
+trivial parallelism because the order of operations are assured to be
+irrelevant. If a shader was allowed to write to globals, there would be
+locking, or it would become an inherently serial operation. Neither of these
+are good for massive core count devices like graphics cards, so that has been a
+self imposed limit and an important factor in their design. Adding shared
+memory to the mix starts to inject some potential locking into the process, and
+hence is explicitly only used when writing compute shaders.
+
+<P>
+Doing all processing this way, without globals / global scratchpads, gives you
+the rigidity of intention to highly parallelise your processing and make it
+easier to think about the system, inspect it, debug it, and extend it or
+interrupt it to hook in new features. If you know the order doesn't matter,
+it's very easy to rerun any tests or transforms that have caused bad state.
+
+<P>
+
+<H1><A NAME="SECTION00380000000000000000">
+Why does database technology matter?</A>
+</H1>
+
+<P>
+As mentioned at the start of the chapter, the relational model is currently a
+very good fit for developing non-sparse data layouts that are manipulable with
+very little complicated state management required once the tables have been
+designed.  However, the only constant is change. That which is current,
+regularly becomes the old way, and for widely scaled systems, the relational
+model no longer provides all features required.
+
+<P>
+After the emergence of NoSQL solutions for handling even larger workloads, and
+various large companies' work on creating solutions to distribute computing
+power, there have been advances in techniques to process enormous data-sets.
+There have been advances in how to keep databases current, distributed, and
+consistent (within tolerance). Databases now regularly include NULL entries,
+to the point where there are far more NULL entries than there are values, and
+these highly sparse databases need a different solution for processing.  Many
+large calculations and processes now run via a technique called map-reduce, and
+distributing workloads has become commonplace enough that people have to be
+reminded they don't always need a cluster to add up some numbers.
+
+<P>
+What's become clear over the last decade is that most of the high-level data
+processing techniques which are proving to be useful are a combination of
+hardware-aware data manipulation layers being used by functional programming
+style high-level algorithms. As the hardware in your PC becomes more and more
+like the internet itself, these techniques will begin to dominate on personal
+hardware, whether it be personal computers, phones, or whatever the next
+generation brings. Data-oriented design was inspired by a realisation that the
+hardware had moved on to the point where the techniques we used to use to
+defend against latency from CPU to hard drive, now apply to memory. In the
+future, if we raise processing power by the utilisation of hoards of isolated
+unreliable computation units, then the techniques for distributing computing
+across servers that we're developing in this era, will apply to the desktops of
+the next.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html301"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="icons/next.png"></A> 
+<A NAME="tex2html297"
+  HREF="dodmain.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="icons/up.png"></A> 
+<A NAME="tex2html291"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="icons/prev.png"></A> 
+<A NAME="tex2html299"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html302"
+  HREF="node4.html">Existential Processing</A>
+<B> Up:</B> <A NAME="tex2html298"
+  HREF="dodmain.html">Data-Oriented Design</A>
+<B> Previous:</B> <A NAME="tex2html292"
+  HREF="node2.html">Data-Oriented Design</A>
+ &nbsp; <B>  <A NAME="tex2html300"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<tt>Online release of Data-Oriented Design : <br>This is the free, online, reduced version. Some inessential chapters are excluded from this version, but in the spirit of this being an education resource, the essentials are present for anyone wanting to learn about data-oriented design.<br>Expect some odd formatting and some broken images and listings as this is auto generated and the Latex to html converters available are not perfect. If the source code listing is broken, you should be able to find the referenced source on <a href="https://github.com/raspofabs/dodbooksourcecode/">github</a>. If you like what you read here, consider purchasing the real paper book from <a href="https://www.amazon.com/dp/1916478700">here</a>, as not only will it look a lot better, but it will help keep this version online for those who cannot afford to buy it. Please send any feedback to <a href="mailto:support@dataorienteddesign.com">support@dataorienteddesign.com</a></tt><br>
+<ADDRESS>
+Richard Fabian
+2018-10-08
+</ADDRESS>
+</BODY>
+</HTML>
