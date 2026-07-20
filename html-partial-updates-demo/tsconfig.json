@@ -1,7 +1,0 @@
-{
-	"include": ["./**/*", "tests/**/*"],
-	"compilerOptions": {
-		"outDir": "./dist",
-		"types": ["node"]
-	}
-}
